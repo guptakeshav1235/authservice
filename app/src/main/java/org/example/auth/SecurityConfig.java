@@ -1,5 +1,6 @@
 package org.example.auth;
 
+import org.example.eventProducer.UserInfoProducer;
 import org.example.repositories.UserRepository;
 import org.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,13 @@ public class SecurityConfig {
     @Autowired
     private final UserService userService;
 
+    @Autowired
+    private final UserInfoProducer userInfoProducer;
+
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        return new UserService(userRepository, passwordEncoder);
+    public UserDetailsService userDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+            UserInfoProducer userInfoProducer) {
+        return new UserService(userRepository, passwordEncoder, userInfoProducer);
     }
 
     @Bean
