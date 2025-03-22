@@ -2,6 +2,7 @@ package org.example.auth;
 
 import java.io.IOException;
 
+import org.example.eventProducer.UserInfoProducer;
 import org.example.services.JwtService;
 import org.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Component
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper = false)
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired

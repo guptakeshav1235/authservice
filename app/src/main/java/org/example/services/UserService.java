@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.example.entities.UserInfo;
+import org.example.eventProducer.UserInfoEvent;
+import org.example.eventProducer.UserInfoProducer;
 import org.example.models.UserInfoDto;
 import org.example.repositories.UserRepository;
 import org.example.utility.ValidationUtility;
@@ -17,19 +19,20 @@ import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Component
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
 public class UserService implements UserDetailsService {
 
     @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private final UserInfoProducer userInfoProducer;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -61,7 +64,19 @@ public class UserService implements UserDetailsService {
         String userId = UUID.randomUUID().toString();
         userRepository.save(new UserInfo(userId, userInfoDto.getUsername(),
                 userInfoDto.getPassword(), new HashSet<>()));
+
+        userInfoProducer.sendEventToKafka(userInfoEventToPublish(userInfoDto, userId));
         return true;
+    }
+
+    private UserInfoEvent userInfoEventToPublish(UserInfoDto userInfoDto, String userId) {
+        return UserInfoEvent.builder()
+                .userId(userId)
+                .firstName(userInfoDto.getFirstName())
+                .lastName(userInfoDto.getLastName())
+                .email(userInfoDto.getEmail())
+                .phoneNumber(userInfoDto.getPhoneNumber())
+                .build();
     }
 
 }
